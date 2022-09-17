@@ -3,6 +3,7 @@ package pkg;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -12,6 +13,20 @@ public class PaymentPage {
 	public PaymentPage(WebDriver driver)
 	{
 		this.driver = driver;
+	}
+	
+	public void selectBothDate(String fromDate, String toDate) {
+		WebElement from = driver.findElement(By.id("dateFrom"));
+    	WebElement to = driver.findElement(By.id("dateTo"));
+    	from.click();
+    	
+    	JavascriptExecutor jse = ((JavascriptExecutor)driver);        	
+    	jse.executeScript("arguments[0].value='"+fromDate+"';", from);
+    	
+		to.click();      	
+    	jse.executeScript("arguments[0].value='"+toDate+"';", to);
+    	
+    	driver.findElement(By.xpath("//label[contains(text(),'Payment Date')]")).click();
 	}
 	
 	public void selectDate(String dateType, String exDay, String exMonth, String exYear) throws InterruptedException
@@ -35,7 +50,7 @@ public class PaymentPage {
 			}
 			catch (Exception e) {
 				driver.navigate().refresh();
-				Thread.sleep(30000);
+				//Thread.sleep(30000);
 				driver.findElement(By.id("dateFrom")).click();
 				Thread.sleep(3000);
 			}
@@ -43,6 +58,7 @@ public class PaymentPage {
 		else
 		{
 			driver.findElement(By.id("dateTo")).click();
+			Thread.sleep(3000);
 		}
 		String monthYear = driver.findElement(By.className("datepicker-switch")).getText();
 		while(!getMonthYear(monthYear)[0].equals(exMonth) && getMonthYear(monthYear)[1].equals(exYear))
