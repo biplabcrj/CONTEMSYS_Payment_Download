@@ -105,11 +105,37 @@ public class Initiator {
 			    	{
 			    		pp.downloadPay();
 			    		System.out.println("Data Found for - TeaBoard Reg No: "+tbrn+" and Auction Centers: "+ac);
+			    		logger.info("Data Found for - TeaBoard Reg No: "+tbrn+" and Auction Centers: "+ac);
 			    		Thread.sleep(5000);
+			    		
+			    		String downloadPath = System.getProperty("user.dir") + "\\downloadFiles";
+						File directoryPath = new File(downloadPath);
+						String contents[] = directoryPath.list();
+						String oldFileName = contents[0];
+						System.out.println("oldfile: "+oldFileName);
+						String newFileName = tbrn + "_" + ac + "_" + rowData.get("StartDate") + "_" + rowData.get("EndDate")+".zip";
+						newFileName = newFileName.replaceAll("/", "-");
+						System.out.println("new name: "+newFileName);
+						File oldFile = new File(System.getProperty("user.dir") + "\\downloadFiles\\" + oldFileName);
+						
+						File directory = new File(System.getProperty("user.dir") + "\\paymentDownload");
+						if (! directory.exists())
+						{
+							directory.mkdir();
+						}
+						File newFile = new File(System.getProperty("user.dir") + "\\paymentDownload\\" + newFileName);
+						boolean flag = oldFile.renameTo(newFile);
+						if (flag == true) {
+							logger.info("File successfully renamed for " +newFileName);
+						} else {
+							logger.info("File rename failed for " + newFileName);
+						}
+						FileUtils.cleanDirectory(directoryPath); 
 			    	}
 			    	else
 			    	{
 			    		System.out.println("No Data Found for - TeaBoard Reg No: "+tbrn+" and Auction Centers: "+ac);
+			    		logger.info("No Data Found for - TeaBoard Reg No: "+tbrn+" and Auction Centers: "+ac);
 			    	}
 			    	driver.navigate().back();
 			    	Thread.sleep(3000);
