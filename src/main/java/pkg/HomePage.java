@@ -28,4 +28,12 @@ public class HomePage {
 		actions.moveToElement(driver.findElement(By.xpath(BankMISXpath))).click(driver.findElement(By.xpath(PayOutXpath))).build().perform();
 		
 	}
+	public void clickDetailed(WebDriver driver)
+	{
+		Actions actions = new Actions(driver);
+		String BankMISXpath = "//a[contains(text(),'Bank MIS')]";
+		String detailedXpath ="//a[contains(text(),'Detailed')]";
+		actions.moveToElement(driver.findElement(By.xpath(BankMISXpath))).click(driver.findElement(By.xpath(detailedXpath))).build().perform();
+		
+	}
 }

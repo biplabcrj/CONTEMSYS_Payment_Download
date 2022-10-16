@@ -15,6 +15,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -55,7 +56,8 @@ public class Initiator {
 			}
 			logger.info("login successful");
 			HomePage homePage = new HomePage(driver);
-			homePage.clickPayOut(driver);
+			//homePage.clickPayOut(driver);
+			homePage.clickDetailed(driver);
 			
 			Select TeaBoardRegNo = new Select(driver.findElement(By.xpath("//td[./span[contains(text(),'TeaBoard Reg No:')]]/following-sibling::td/select")));
 		    List <WebElement> op = TeaBoardRegNo.getOptions();
@@ -67,7 +69,7 @@ public class Initiator {
 		    	List <WebElement> opNew = TeaBoardRegNo1.getOptions();
 		    	String tbrn = opNew.get(i).getText();
 		    	TeaBoardRegNo1.selectByIndex(i);
-		    	Thread.sleep(3000);
+		    	Thread.sleep(2000);
 		    	Select AuctionCenters = new Select(driver.findElement(By.xpath("//td[./span[contains(text(),'Auction Centers :')]]/following-sibling::td/select")));
 			    List <WebElement> op1 = AuctionCenters.getOptions();
 			    int size1 = op1.size();
@@ -79,29 +81,46 @@ public class Initiator {
 			    	List <WebElement> op1New = AuctionCenters1.getOptions();
 			    	String ac = op1New.get(j).getText();
 			    	AuctionCenters1.selectByIndex(j);
-			    	Thread.sleep(3000);
+			    	Thread.sleep(2000);
 			    	driver.findElement(By.xpath("//input[@type='submit']")).click();
 			    	//Thread.sleep(5000);
 			    	
-			    	WebDriverWait wt = new WebDriverWait(driver,120);
+			    	WebDriverWait wt = new WebDriverWait(driver,180);
 			    	WebElement pageWait = driver.findElement(By.xpath("//h4[text()='Please wait...']"));
-			    	wt.until(ExpectedConditions.invisibilityOf(pageWait));
+			    	try {
+			    		wt.until(ExpectedConditions.invisibilityOf(pageWait));
+			    	}catch(UnhandledAlertException uac) {
+			    		
+			    	}
+			    	
 			    	
 			    	PaymentPage pp = new PaymentPage(driver);
-			    	
+			    	Thread.sleep(2000);
 			    	pp.selectBothDate(rowData.get("StartDate"), rowData.get("EndDate"));
 			    	
 			    	//pp.selectDate("fromdate", "1", "August", "2022");
 			    	//pp.selectDate("todate", "15", "August", "2022");
+			    	int count = 0;
+			    	while(count<5) {
+			    		pp.clickonSearchBtn();
+				    	
+				    	WebElement pageWait1 = driver.findElement(By.xpath("//h4[text()='Please wait...']"));
+				    	try {
+				    		wt.until(ExpectedConditions.invisibilityOf(pageWait1));
+				    	}catch(UnhandledAlertException uac) {
+				    		count++;
+				    		continue;
+				    	}
+				    	Thread.sleep(5000);
+				    	break;
+			    	}
 			    	
-			    	
-			    	pp.clickonSearchBtn();
-			    	
-			    	WebElement pageWait1 = driver.findElement(By.xpath("//h4[text()='Please wait...']"));
-			    	wt.until(ExpectedConditions.invisibilityOf(pageWait1));
-			    	//Thread.sleep(5000);
-			    	
-			    	if(pp.isDataPresent())
+			    	if(count==5)
+			    	{
+			    		System.out.println("Application Issue for - TeaBoard Reg No: "+tbrn+" and Auction Centers: "+ac+" Please try manually");
+			    		logger.info("Application Issue for - TeaBoard Reg No: "+tbrn+" and Auction Centers: "+ac+" Please try manually");
+			    	}
+			    	else if(pp.isDataPresent())
 			    	{
 			    		pp.downloadPay();
 			    		System.out.println("Data Found for - TeaBoard Reg No: "+tbrn+" and Auction Centers: "+ac);
